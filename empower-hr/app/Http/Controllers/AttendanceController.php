@@ -41,4 +41,20 @@ class AttendanceController extends Controller
         Attendance::destroy($id);
         return response()->json(null, 204);
     }
+
+    // In app/Http/Controllers/AttendanceController.php
+    public function myAttendance(Request $request)
+    {
+        $user = $request->user();
+        // Using the relationship defined in User model:
+        $employee = $user->employee;
+        
+        if (!$employee) {
+            return response()->json(['message' => 'Employee record not found.'], 404);
+        }
+        
+        $attendances = Attendance::where('employee_id', $employee->id)->get();
+        return response()->json($attendances);
+    }
+
 }
