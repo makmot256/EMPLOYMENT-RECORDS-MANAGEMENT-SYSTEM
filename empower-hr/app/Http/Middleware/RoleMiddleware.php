@@ -8,20 +8,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string  $role
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next, string $role)
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // Check if the authenticated user's role matches the required role
-        if (!$request->user() || $request->user()->role !== $role) {
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        $user = $request->user();
+
+        // Explode roles if passed as comma-separated string
+        if (count($roles) === 1 && str_contains($roles[0], ',')) {
+            $roles = explode(',', $roles[0]);
         }
+
+        $roles = array_map('trim', $roles); // Clean whitespace
+
+        if (!$user || !in_array($user->role, $roles)) {
+            return response()->json(['message' => 'Forbidden: Insufficient permissions'], 403);
+        }
+
         return $next($request);
     }
 }

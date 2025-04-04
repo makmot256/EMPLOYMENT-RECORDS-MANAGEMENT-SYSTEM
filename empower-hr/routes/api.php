@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // ----------------- Employee Routes -----------------
 // Routes accessible by employees to view and update their own information.
-Route::middleware(['auth:sanctum', 'role:Employee'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:System Administrator, Department Manager, HR Manager,Employee'])->group(function () {
     // Example: Viewing personal profile or attendance records.
     Route::get('my/profile', [EmployeeController::class, 'myProfile']);
     Route::get('my/attendance', [AttendanceController::class, 'myAttendance']);
@@ -35,7 +35,7 @@ Route::middleware(['auth:sanctum', 'role:Employee'])->group(function () {
 
 // ----------------- Department Manager Routes -----------------
 // Routes accessible by department managers.
-Route::middleware(['auth:sanctum', 'role:Department Manager'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:System Administrator, HR Manager,Department Manager'])->group(function () {
     // They can view employees in their department
     Route::get('department/employees', [DepartmentController::class, 'departmentEmployees']);
     // Approve or reject leave requests
@@ -45,7 +45,7 @@ Route::middleware(['auth:sanctum', 'role:Department Manager'])->group(function (
 
 // ----------------- HR Manager Routes -----------------
 // HR Managers have broader access for full employee management.
-Route::middleware(['auth:sanctum', 'role:HR Manager'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:System Administrator, HR Manager'])->group(function () {
     Route::apiResource('employees', EmployeeController::class);
     Route::apiResource('departments', DepartmentController::class);
     Route::apiResource('payroll', PayrollController::class);
@@ -53,7 +53,9 @@ Route::middleware(['auth:sanctum', 'role:HR Manager'])->group(function () {
     Route::apiResource('users', UserController::class);
     // Reporting endpoints
     Route::get('reports', [ReportController::class, 'index']);
-    Route::get('reports/export/csv', [ReportController::class, 'exportCsv']);
+    Route::get('reports/export/excel', [ReportController::class, 'exportExcel']);
+    Route::get('reports/export/pdf', [ReportController::class, 'exportPdf']);
+    // Route::get('reports/export/csv', [ReportController::class, 'exportCsv']);
 });
 
 // ----------------- System Administrator Routes -----------------
